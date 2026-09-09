@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>বটতলী ইসলামি সিনিয়র আলিম মাদ্রাসা - সমন্বিত পোর্টাল</title>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color: #f4f6f9; color: #333; line-height: 1.5; position: relative; }
+
+/* Header & Navigation */
+header { background-color: #0d5c3a; color: white; padding: 15px 10px; text-align: center; border-bottom: 4px solid #083c25; }
+.header-container { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.logo-svg { width: 60px; height: 60px; background: #fff; border-radius: 50%; padding: 4px; border: 2px solid #eab308; }
+.header-content h1 { font-size: 22px; }
+.header-content p { font-size: 12px; }
+
+.live-time-bar { background: #062e1c; color: #eab308; text-align: center; padding: 6px; font-weight: bold; font-size: 13px; border-bottom: 1px solid #166534; }
+
+nav { background-color: #083c25; display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 1000; }
+.tab-btn { background: transparent; color: white; border: none; outline: none; padding: 12px 14px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
+.tab-btn:hover, .tab-btn.active { background-color: #0d5c3a; border-bottom: 3px solid #eab308; }
+
+.marquee-section { background: #e0f2fe; color: #0369a1; padding: 6px 0; font-weight: bold; display: flex; align-items: center; font-size: 13px; }
+.marquee-title { background: #0284c7; color: white; padding: 2px 8px; margin-left: 10px; border-radius: 3px; white-space: nowrap; }
+
+/* Main Layout */
+.container { width: 95%; max-width: 1250px; margin: 15px auto; }
+.page-tab { display: none; }
+.page-tab.active-tab { display: block; }
+
+.card { background: white; padding: 18px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+.card h2 { color: #0d5c3a; border-bottom: 2px solid #0d5c3a; padding-bottom: 6px; margin-bottom: 12px; font-size: 18px; }
+
+/* Hadith Card */
+.hadith-card { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #86efac; border-left: 5px solid #16a34a; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+.hadith-card h3 { color: #166534; font-size: 15px; margin-bottom: 6px; }
+.hadith-card p { font-size: 13px; color: #1e293b; line-height: 1.6; }
+.hadith-ref { font-size: 11px; color: #059669; font-weight: bold; margin-top: 6px; text-align: right; }
+
+/* Form Styles */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.form-group { margin-bottom: 8px; }
+.form-group label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 12px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+
+.btn-submit { background-color: #0d5c3a; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
+.btn-submit:hover { background-color: #083c25; }
+.btn-secondary { background-color: #0284c7; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
+.btn-danger { background-color: #b91c1c; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+
+/* Table Styles */
+.custom-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; }
+.custom-table th, .custom-table td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+.custom-table th { background-color: #0d5c3a; color: white; }
+
+.btn-action { padding: 4px 8px; font-size: 11px; border: none; border-radius: 3px; cursor: pointer; color: white; margin-right: 4px; font-weight: bold; }
+.btn-delete { background-color: #b91c1c; }
+.btn-print { background-color: #16a34a; }
+.btn-view { background-color: #0284c7; }
+
+/* Dynamic Subject Input Section */
+.subject-entry-card { background: #f8fafc; border: 1px dashed #0d5c3a; padding: 12px; border-radius: 6px; margin-top: 10px; margin-bottom: 15px; }
+.subject-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.subject-row input { padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; }
+
+/* Status Badge */
+.badge-pending { background-color: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+.badge-published { background-color: #16a34a; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+
+/* Sub Nav */
+.admin-sub-nav { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; background: #e2e8f0; padding: 8px; border-radius: 6px; }
+.admin-sub-btn { background: #ffffff; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+.admin-sub-btn.active-sub { background: #0d5c3a; color: white; border-color: #0d5c3a; }
+
+/* Login Box Styling */
+.login-box { max-width: 400px; margin: 30px auto; background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.login-box h3 { text-align: center; color: #0d5c3a; margin-bottom: 15px; }
+
+.logged-user-bar { background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 8px 12px; border-radius: 5px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+
+/* Result Card & Image Styling */
+.result-card { border: 2px solid #0d5c3a; padding: 20px; background: #fff; border-radius: 8px; margin-top: 15px; }
+.result-header { text-align: center; border-bottom: 2px solid #0d5c3a; padding-bottom: 10px; margin-bottom: 15px; }
+.student-photo-box { width: 90px; height: 110px; border: 1px solid #0d5c3a; border-radius: 4px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; }
+.student-photo-box img { width: 100%; height: 100%; object-fit: cover; }
+
+.photo-preview { width: 90px; height: 110px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden; border-radius: 4px; }
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.table-avatar { width: 40px; height: 45px; object-fit: cover; border-radius: 3px; border: 1px solid #ccc; }
+
+/* Modal / Popup for Admission Form Print */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 15px; }
+.modal-content { background: white; width: 100%; max-width: 750px; border-radius: 8px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+
+/* Notice Card Styling */
+.notice-card { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 5px solid #0284c7; padding: 15px; border-radius: 6px; margin-bottom: 12px; }
+.notice-card h4 { color: #0369a1; margin-bottom: 5px; font-size: 16px; }
+.notice-date { font-size: 11px; color: #64748b; margin-bottom: 8px; }
+.notice-media { margin-top: 10px; max-width: 100%; text-align: center; }
+.notice-media img { max-width: 100%; max-height: 400px; border-radius: 6px; border: 1px solid #cbd5e1; }
+.pdf-link { display: inline-block; background: #0284c7; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 12px; margin-top: 6px; font-weight: bold; }
+
+/* Exam Custom Styles */
+.exam-timer-bar { background: #b91c1c; color: white; padding: 10px; text-align: center; font-size: 18px; font-weight: bold; border-radius: 6px; margin-bottom: 15px; position: sticky; top: 50px; z-index: 900; }
+.q-box { background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #0d5c3a; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
+.q-box h4 { font-size: 14px; margin-bottom: 8px; color: #0f172a; }
+.q-options { display: flex; flex-direction: column; gap: 6px; }
+.q-option-label { font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; background: #fff; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 4px; }
+.q-option-label:hover { background: #f1f5f9; }
+
+/* Floating Auto-Message Widget */
+.chat-widget-btn { position: fixed; bottom: 20px; right: 20px; background: #0d5c3a; color: white; border: none; padding: 12px 18px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1500; display: flex; align-items: center; gap: 8px; }
+.chat-widget-btn:hover { background: #083c25; }
+
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+  .no-print { display: none !important; }
+}
+footer { background-color: #1e293b; color: white; text-align: center; padding: 12px 0; margin-top: 20px; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- হেডার -->
+<header>
+  <div class="header-container">
+    <svg class="logo-svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="#0d5c3a" stroke-width="4"/>
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#eab308" stroke-width="2"/>
+      <path d="M 35 65 L 35 45 Q 50 25 65 45 L 65 65 Z" fill="#0d5c3a"/>
+    </svg>
+    <div class="header-content">
+      <h1 id="ins_name_header">বটতলী ইসলামি সিনিয়র আলিম মাদ্রাসা</h1>
+      <p id="ins_address_header">পরশুরাম, ফেনী। (EIIN: 106697)</p>
+    </div>
+  </div>
+</header>
+
+<!-- সময় বার -->
+<div class="live-time-bar" id="live_time_display">🕒 সময় ও তারিখ লোড হচ্ছে...</div>
+
+<!-- নেভিগেশন -->
+<nav class="no-print">
+  <button class="tab-btn active" onclick="switchTab('home', event)">🏠 হোম</button>
+  <button class="tab-btn" onclick="switchTab('annual_results', event)">🎓 ফলাফল অনুসন্ধান</button>
+  <button class="tab-btn" onclick="switchTab('notice', event)">📌 নোটিশ বোর্ড</button>
+  <button class="tab-btn" onclick="switchTab('teachers', event)">👨‍🏫 শিক্ষকবৃন্দ</button>
+  <button class="tab-btn" onclick="switchTab('admission', event)">📝 অনলাইন ভর্তি</button>
+  <button class="tab-btn" onclick="switchTab('exam', event)">✍️ অনলাইন পরীক্ষা</button>
+  <button class="tab-btn" onclick="switchTab('report', event)">📩 অভিযোগ/রিপোর্ট</button>
+  <button class="tab-btn" onclick="switchTab('teacher_panel', event)">🔑 শিক্ষক প্যানেল</button>
+  <button class="tab-btn" onclick="switchTab('admin', event)">🔒 এডমিন প্যানেল</button>
+</nav>
+
+<!-- নোটিশ মার্কিউ -->
+<div class="marquee-section no-print">
+  <div class="marquee-title">জরুরি নোটিশ:</div>
+  <marquee scrollamount="5" id="marquee_notice_text">২০২৬ শিক্ষাবর্ষের অর্ধবার্ষিক ও বার্ষিক পরীক্ষার রেজাল্ট এবং ভর্তি সংক্রান্ত আপডেট পেতে পোর্টাল নজর রাখুন।</marquee>
+</div>
+
+<!-- মূল কন্টেইনার -->
+<div class="container">
+
+  <!-- হাদিস সেকশন -->
+  <div class="hadith-card no-print">
+    <h3>📖 প্রতিদিনের হাদিস</h3>
+    <p id="hadith_text">"তোমাদের মধ্যে সর্বোত্তম সেই ব্যক্তি, যে কুরআন শেখে এবং অন্যকে শিক্ষা দেয়।"</p>
+    <div class="hadith-ref" id="hadith_ref">— সহীহ বুখারী, হাদিস নং: ৫০২৭</div>
+  </div>
+
+  <!-- ১. হোম -->
+  <div id="tab-home" class="page-tab active-tab">
+    <div class="card">
+      <h2>স্বাগতম - সমন্বিত ডিজিটাল অনলাইন পোর্টাল</h2>
+      <p>এই অনলাইন পোর্টালের মাধ্যমে শিক্ষক, শিক্ষার্থী এবং এডমিন যেকোনো স্থান থেকে রিয়েল-টাইমে ডেটা এক্সেস করতে পারবেন।</p>
+    </div>
+  </div>
+
+  <!-- ২. পরীক্ষা ফলাফল অনুসন্ধান -->
+  <div id="tab-annual_results" class="page-tab">
+    <div class="card">
+      <h2>🎓 অনলাইন পরীক্ষা ফলাফল অনুসন্ধান</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>পরীক্ষার ধরন:</label>
+          <select id="search_res_type">
+            <option value="অনলাইন কুইজ পরীক্ষা">অনলাইন কুইজ পরীক্ষা</option>
+            <option value="অর্ধবার্ষিক পরীক্ষা">অর্ধবার্ষিক পরীক্ষা</option>
+            <option value="বার্ষিক পরীক্ষা">বার্ষিক পরীক্ষা</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>শ্রেণি নির্বাচন করুন:</label>
+          <select id="search_res_class">
+            <option>১ম শ্রেণি</option><option>২য় শ্রেণি</option><option>৩য় শ্রেণি</option><option>৪র্থ শ্রেণি</option><option>৫ম শ্রেণি</option>
+            <option>৬ষ্ঠ শ্রেণি</option><option>৭ম শ্রেণি</option><option>৮ম শ্রেণি</option><option>৯ম শ্রেণি</option><option>১০ম শ্রেণি</option>
+            <option>আলিম ১ম বর্ষ</option><option>আলিম ২য় বর্ষ</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>ক্লাস রোল নম্বর:</label>
+          <input type="number" id="search_res_roll" placeholder="যেমন: 5">
+        </div>
+        <div class="form-group" style="align-self: flex-end;">
+          <button class="btn-submit" onclick="searchAnnualResult()">ফলাফল দেখুন</button>
+        </div>
+      </div>
+
+      <div id="annual_result_display" style="display:none;" class="result-card print-area">
+        <div class="result-header">
+          <h2 id="res_school_name">বটতলী ইসলামি সিনিয়র আলিম মাদ্রাসা</h2>
+          <h3 style="color:#0d5c3a;"><span id="res_exam_type_title">পরীক্ষা</span> - ফলাফল মার্কশিট</h3>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:15px; font-size:13px; gap:10px;">
+          <div>
+            <p><strong>শিক্ষার্থীর নাম:</strong> <span id="res_st_name"></span></p>
+            <p><strong>আইডি নম্বর:</strong> <span id="res_st_id"></span></p>
+            <p><strong>শ্রেণি:</strong> <span id="res_st_class"></span></p>
+            <p><strong>রোল নম্বর:</strong> <span id="res_st_roll"></span></p>
+          </div>
+          <div>
+            <p><strong>মোট নম্বর:</strong> <span id="res_st_total" style="color:#0d5c3a; font-weight:bold;"></span></p>
+            <p><strong>জিপিএ / গ্রেড:</strong> <span id="res_st_gpa" style="background:#eab308; padding:2px 6px; border-radius:4px; font-weight:bold;"></span></p>
+          </div>
+          <div class="student-photo-box" id="res_st_photo_box">
+            <span style="font-size:10px; color:#aaa;">ছবি নেই</span>
+          </div>
+        </div>
+
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>বিষয়</th>
+              <th>প্রাপ্ত নম্বর</th>
+              <th>লেটার গ্রেড</th>
+            </tr>
+          </thead>
+          <tbody id="res_subjects_tbody"></tbody>
+        </table>
+
+        <div style="margin-top:15px; text-align:right;" class="no-print">
+          <button class="btn-action btn-print" onclick="window.print()">🖨️ মার্কশিট প্রিন্ট / PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ৩. নোটিশ বোর্ড -->
+  <div id="tab-notice" class="page-tab">
+    <div class="card">
+      <h2>📌 অফিশিয়াল নোটিশ বোর্ড</h2>
+      <div id="public_notice_list"><p>বর্তমানে কোনো নতুন নোটিশ নেই।</p></div>
+    </div>
+  </div>
+
+  <!-- ৪. শিক্ষকবৃন্দ -->
+  <div id="tab-teachers" class="page-tab">
+    <div class="card">
+      <h2>👨‍🏫 শিক্ষক ও কর্মচারীবৃন্দ</h2>
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>আইডি</th>
+            <th>শিক্ষকের নাম</th>
+            <th>পদবী / বিষয়</th>
+            <th>মোবাইল</th>
+          </tr>
+        </thead>
+        <tbody id="teachers_public_tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ৫. অনলাইন ভর্তি -->
+  <div id="tab-admission" class="page-tab">
+    <div class="card">
+      <h2>📝 অনলাইন ভর্তি ফরম</h2>
+      <form onsubmit="handleAdmission(event)">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 250px;">
+            <div class="form-grid">
+              <div class="form-group"><label>শিক্ষার্থীর নাম:</label><input type="text" id="adm_st_name" required></div>
+              <div class="form-group"><label>পিতার নাম:</label><input type="text" id="adm_fa_name" required></div>
+              <div class="form-group"><label>মাতার নাম:</label><input type="text" id="adm_mo_name" required></div>
+              <div class="form-group"><label>জন্ম তারিখ:</label><input type="date" id="adm_dob" required></div>
+              <div class="form-group">
+                <label>শ্রেণি:</label>
+                <select id="adm_class">
+                  <option>১ম শ্রেণি</option><option>২য় শ্রেণি</option><option>৩য় শ্রেণি</option><option>৪র্থ শ্রেণি</option><option>৫ম শ্রেণি</option>
+                  <option>৬ষ্ঠ শ্রেণি</option><option>৭ম শ্রেণি</option><option>৮ম শ্রেণি</option><option>৯ম শ্রেণি</option><option>১০ম শ্রেণি</option>
+                  <option>আলিম ১ম বর্ষ</option><option>আলিম ২য় বর্ষ</option>
+                </select>
+              </div>
+              <div class="form-group"><label>মোবাইল নম্বর:</label><input type="tel" id="adm_phone" required></div>
+            </div>
+          </div>
+          <div style="width: 150px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <label style="font-size: 12px; font-weight: bold;">শিক্ষার্থীর ছবি:</label>
+            <div class="photo-preview" id="adm_photo_preview">
+              <span style="font-size: 10px; color: #888;">ছবি নির্বাচন করুন</span>
+            </div>
+            <input type="file" id="adm_photo_input" accept="image/*" onchange="previewStudentPhoto(event)" style="font-size: 11px; width: 100%;" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit" style="margin-top:15px;">আবেদন জমা দিন</button>
+      </form>
+
+      <!-- আবেদন সফল হলে ভর্তি ফরম দেখার সেকশন -->
+      <div id="latest_admission_download_card" style="display:none; margin-top:20px; padding:15px; background:#dcfce7; border:1px solid #86efac; border-radius:6px;">
+        <h3 style="color:#166534; font-size:15px; margin-bottom:5px;">✅ আবেদন সফলভাবে জমা হয়েছে!</h3>
+        <p style="font-size:12px; margin-bottom:10px;">আপনার ভর্তি আবেদন ফরমটি সংগ্রহ করতে নিচের বোতামে ক্লিক করে ডাউনলোড বা প্রিন্ট করুন।</p>
+        <button class="btn-action btn-print" style="padding:8px 16px; font-size:13px;" onclick="openAdmissionModal(admissionsDB.length - 1)">📄 ভর্তি ফরম প্রিন্ট / ডাউনলোড করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ৬. অনলাইন পরীক্ষা (শিক্ষার্থী প্যানেল) -->
+  <div id="tab-exam" class="page-tab">
+    <div class="card">
+      <h2>✍️ অনলাইন পরীক্ষা পোর্টাল (২০টি প্রশ্ন - ২০ মিনিট)</h2>
+      
+      <!-- প্রাথমিক নির্বাচন ও এন্ট্রি -->
+      <div id="exam_init_box">
+        <div class="form-grid">
+          <div class="form-group"><label>পরীক্ষার্থীর নাম:</label><input type="text" id="ex_st_name" placeholder="আপনার নাম লিখুন"></div>
+          <div class="form-group"><label>রোল নম্বর/আইডি:</label><input type="text" id="ex_st_roll" placeholder="রোল নম্বর লিখুন"></div>
+          <div class="form-group">
+            <label>শ্রেণি নির্বাচন করুন:</label>
+            <select id="exam_select_class" onchange="loadExamSubjectOptions()">
+              <option value="">শ্রেণি বাছুন</option>
+              <option>১ম শ্রেণি</option><option>২য় শ্রেণি</option><option>৩য় শ্রেণি</option><option>৪র্থ শ্রেণি</option><option>৫ম শ্রেণি</option>
+              <option>৬ষ্ঠ শ্রেণি</option><option>৭ম শ্রেণি</option><option>৮ম শ্রেণি</option><option>৯ম শ্রেণি</option><option>১০ম শ্রেণি</option>
+              <option>আলিম ১ম বর্ষ</option><option>আলিম ২য় বর্ষ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>বিষয় / পরীক্ষা নির্বাচন করুন:</label>
+            <select id="exam_select_subject">
+              <option value="">শ্রেণি নির্বাচন করুন আগে</option>
+            </select>
+          </div>
+          <div class="form-group" style="align-self: flex-end;">
+            <button class="btn-submit" onclick="startStudentExam()">পরীক্ষা শুরু করুন</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- রানিং অনলাইন পরীক্ষা ইন্টারফেস -->
+      <div id="exam_running_box" style="display:none;">
+        <div class="exam-timer-bar">
+          ⏳ অবশিষ্ট সময়: <span id="exam_timer_display">২০:০০</span> মিনিট
+        </div>
+
+        <div style="background:#f1f5f9; padding:10px; border-radius:6px; margin-bottom:15px; font-size:13px;">
+          <strong>পরীক্ষার্থী:</strong> <span id="run_st_name"></span> | 
+          <strong>শ্রেণি:</strong> <span id="run_st_class"></span> | 
+          <strong>রোল:</strong> <span id="run_st_roll"></span> | 
+          <strong>বিষয়:</strong> <span id="run_st_subject"></span>
+        </div>
+
+        <form id="student_exam_form" onsubmit="submitStudentExam(event)">
+          <div id="exam_questions_container"></div>
+          <button type="submit" class="btn-submit" style="width:100%; font-size:16px; padding:12px; margin-top:15px;">📤 উত্তরপত্র জমা দিন</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ৭. অভিযোগ/রিপোর্ট -->
+  <div id="tab-report" class="page-tab">
+    <div class="card">
+      <h2>📩 অভিযোগ / মতামত জমা দিন</h2>
+      <form onsubmit="handleReportSubmit(event)">
+        <div class="form-group"><label>আপনার নাম:</label><input type="text" id="rep_name" required></div>
+        <div class="form-group"><label>মোবাইল:</label><input type="tel" id="rep_phone" required></div>
+        <div class="form-group"><label>অভিযোগ/পরামর্শ:</label><textarea id="rep_msg" rows="4" required></textarea></div>
+        <button type="submit" class="btn-submit">জমা দিন</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ৮. শিক্ষক প্যানেল -->
+  <div id="tab-teacher_panel" class="page-tab">
+    <div class="card">
+      <h2>🔑 শিক্ষক প্যানেল (রেজাল্ট ইনপুট, প্রশ্ন সেট আপ ও যাচাই)</h2>
+      <!-- লগইন ফরম -->
+      <div id="teacher_login_box" class="login-box">
+        <h3>👨‍🏫 শিক্ষক লগইন</h3>
+        <div class="form-group">
+          <label>শিক্ষক আইডি (User ID):</label>
+          <input type="text" id="teacher_user_id" placeholder="User ID">
+        </div>
+        <div class="form-group">
+          <label>পাসওয়ার্ড:</label>
+          <input type="password" id="teacher_user_pass" placeholder="Password">
+        </div>
+        <button class="btn-submit" style="width: 100%; margin-top: 10px;" onclick="handleTeacherLogin()">লগইন করুন</button>
+      </div>
+
+      <!-- শিক্ষক ড্যাশবোর্ড -->
+      <div id="teacher_dashboard_box" style="display:none;">
+        <div class="logged-user-bar">
+          <span>👨‍🏫 লগইন আছেন: <strong id="current_teacher_name"></strong> (<span id="current_teacher_id"></span>) - <small id="current_teacher_subject"></small></span>
+          <button class="btn-danger" onclick="logoutTeacher()">লগআউট</button>
+        </div>
+
+        <div class="admin-sub-nav">
+          <button class="admin-sub-btn active-sub" onclick="switchTeacherSub('manual_entry', event)">✍️ ম্যানুয়াল রেজাল্ট ইনপুট</button>
+          <button class="admin-sub-btn" onclick="switchTeacherSub('create_exam', event)">📝 ২০টি প্রশ্ন তৈরি করুন</button>
+          <button class="admin-sub-btn" onclick="switchTeacherSub('verify_submissions', event)">📥 শিক্ষার্থীদের জমা উত্তরপত্র যাচাই</button>
+        </div>
+
+        <!-- ১. ম্যানুয়াল রেজাল্ট ইনপুট -->
+        <div id="teacher-sub-manual_entry">
+          <h3 style="color:#0d5c3a; margin-bottom:10px;">অর্ধবার্ষিক / বার্ষিক পরীক্ষার রেজাল্ট তৈরি করুন</h3>
+          <form onsubmit="handleResultUpload(event)">
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 250px;">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>পরীক্ষার ধরন:</label>
+                    <select id="tr_exam_type">
+                      <option value="অর্ধবার্ষিক পরীক্ষা">অর্ধবার্ষিক পরীক্ষা</option>
+                      <option value="বার্ষিক পরীক্ষা">বার্ষিক পরীক্ষা</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label>শিক্ষার্থীর নাম:</label><input type="text" id="tr_st_name" required></div>
+                  <div class="form-group"><label>স্টুডেন্ট আইডি:</label><input type="text" id="tr_st_id" placeholder="যেমন: ST-101" required></div>
+                  <div class="form-group"><label>রোল নম্বর:</label><input type="number" id="tr_st_roll" required></div>
+                  <div class="form-group">
+                    <label>শ্রেণি:</label>
+                    <select id="tr_st_class">
+                      <option>১ম শ্রেণি</option><option>২য় শ্রেণি</option><option>৩য় শ্রেণি</option><option>৪র্থ শ্রেণি</option><option>৫ম শ্রেণি</option>
+                      <option>৬ষ্ঠ শ্রেণি</option><option>৭ম শ্রেণি</option><option>৮ম শ্রেণি</option><option>৯ম শ্রেণি</option><option>১০ম শ্রেণি</option>
+                      <option>আলিম ১ম বর্ষ</option><option>আলিম ২য় বর্ষ</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- বিষয়সমূহ যোগ করার সেকশন -->
+                <div class="subject-entry-card">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h4 style="color:#0d5c3a; font-size:14px;">📚 বিষয় ও নম্বরের তালিকা:</h4>
+                    <button type="button" class="btn-secondary" style="padding:4px 8px; font-size:12px;" onclick="addSubjectRow()">➕ নতুন বিষয় যুক্ত করুন</button>
+                  </div>
+                  <div id="dynamic_subjects_container"></div>
+                </div>
+
+              </div>
+
+              <div style="width: 140px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                <label style="font-size: 12px; font-weight: bold;">শিক্ষার্থীর ছবি:</label>
+                <div class="photo-preview" id="tr_photo_preview">
+                  <span style="font-size: 10px; color: #888;">ছবি নির্বাচন করুন</span>
+                </div>
+                <input type="file" id="tr_photo_input" accept="image/*" onchange="previewResultStudentPhoto(event)" style="font-size: 11px; width: 100%;">
+              </div>
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top:15px; width:100%; font-size:14px;">📤 রেজাল্ট জমা দিন (এডমিন অনুমোদনের জন্য)</button>
+          </form>
+        </div>
+
+        <!-- ২. ২০টি অনলাইন প্রশ্ন তৈরি সেকশন -->
+        <div id="teacher-sub-create_exam" style="display:none;">
+          <h3 style="color:#0d5c3a; margin-bottom:10px;">📝 অনলাইন পরীক্ষার প্রশ্নপত্র তৈরি করুন (২০টি MCQ - ২০ মিনিট)</h3>
+          <form onsubmit="handleSaveTeacherQuestions(event)">
+            <div class="form-grid" style="margin-bottom:15px; background:#f1f5f9; padding:10px; border-radius:6px;">
+              <div class="form-group">
+                <label>শ্রেণি নির্বাচন করুন:</label>
+                <select id="create_exam_class" required>
+                  <option value="">শ্রেণি বাছুন</option>
+                  <option>১ম শ্রেণি</option><option>২য় শ্রেণি</option><option>৩য় শ্রেণি</option><option>৪র্থ শ্রেণি</option><option>৫ম শ্রেণি</option>
+                  <option>৬ষ্ঠ শ্রেণি</option><option>৭ম শ্রেণি</option><option>৮ম শ্রেণি</option><option>৯ম শ্রেণি</option><option>১০ম শ্রেণি</option>
+                  <option>আলিম ১ম বর্ষ</option><option>আলিম ২য় বর্ষ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>বিষয় / বিষয় কোড:</label>
+                <input type="text" id="create_exam_subject" placeholder="যেমন: আল-কুরআন ও তাজভিদ" required>
+              </div>
+            </div>
+
+            <div id="questions_creator_wrapper">
+              <!-- ২০টি প্রশ্নের ইনপুট ফিল্ড ডায়নামিকভাবে তৈরি হবে -->
+            </div>
+
+            <button type="submit" class="btn-submit" style="width:100%; padding:10px; font-size:15px; margin-top:15px;">💾 ২০টি প্রশ্ন সেভ ও পাবলিশ করুন</button>
+          </form>
+        </div>
+
+        <!-- ৩. শিক্ষার্থীদের জমা দেওয়া উত্তরপত্র অনলাইন যাচাই -->
+        <div id="teacher-sub-verify_submissions" style="display:none;">
+          <h3 style="color:#0d5c3a; margin-bottom:10px;">📥 জমা হওয়া উত্তরপত্র ও অটো-মার্কস যাচাই</h3>
+          <p style="font-size:12px; color:#666; margin-bottom:10px;">শিক্ষার্থীরা অনলাইন পরীক্ষা সম্পন্ন করার পর জমা দেওয়া খাতাগুলো এখানে প্রদর্শিত হচ্ছে। আপনি তা যাচাই করে ফাইনাল রেজাল্ট পাবলিশ করতে পারবেন।</p>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>আইডি/রোল</th>
+                <th>পরীক্ষার্থীর নাম</th>
+                <th>শ্রেণি</th>
+                <th>বিষয়</th>
+                <th>অটো প্রাপ্ত মার্কস (২০-এ)</th>
+                <th>জমার সময়</th>
+                <th>অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody id="teacher_submissions_tbody"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ৯. এডমিন প্যানেল -->
+  <div id="tab-admin" class="page-tab">
+    <div class="card">
+      <h2>🔒 এডমিন কন্ট্রোল প্যানেল</h2>
+      
+      <!-- এডমিন লগইন ফরম -->
+      <div id="admin_login_box" class="login-box">
+        <h3>🔐 এডমিন লগইন</h3>
+        <div class="form-group">
+          <label>এডমিন আইডি (Admin ID):</label>
+          <input type="text" id="admin_user_id" placeholder="Admin ID">
+        </div>
+        <div class="form-group">
+          <label>পাসওয়ার্ড:</label>
+          <input type="password" id="admin_user_pass" placeholder="Password">
+        </div>
+        <button class="btn-submit" style="width: 100%; margin-top: 10px;" onclick="handleAdminLogin()">লগইন করুন</button>
+      </div>
+
+      <!-- এডমিন ড্যাশবোর্ড -->
+      <div id="admin_dashboard_box" style="display:none;">
+        <div class="logged-user-bar">
+          <span>🛡️ মূল এডমিন প্যানেলে সংযুক্ত আছেন</span>
+          <button class="btn-danger" onclick="logoutAdmin()">লগআউট</button>
+        </div>
+
+        <div class="admin-sub-nav">
+          <button class="admin-sub-btn active-sub" onclick="switchAdminSub('res_app', event)">🎓 রেজাল্ট এপ্রুভাল ও ভিউ (ছবিসহ)</button>
+          <button class="admin-sub-btn" onclick="switchAdminSub('notice_manage', event)">📌 নোটিশ প্রকাশ (ছবি/PDF)</button>
+          <button class="admin-sub-btn" onclick="switchAdminSub('teacher_entry', event)">👨‍🏫 শিক্ষক ইউজার তৈরি</button>
+          <button class="admin-sub-btn" onclick="switchAdminSub('adm_apps', event)">📝 ভর্তি আবেদনসমূহ (ডাউনলোড সহ)</button>
+          <button class="admin-sub-btn" onclick="switchAdminSub('reports_view', event)">📩 অভিযোগ তালিকা</button>
+          <button class="admin-sub-btn" onclick="switchAdminSub('change_pass', event)">🔑 পাসওয়ার্ড পরিবর্তন</button>
+        </div>
+
+        <!-- ক) রেজাল্ট এপ্রুভাল -->
+        <div id="admin-sub-res_app">
+          <h3>শিক্ষকদের তৈরি করা রেজাল্টসমূহ (ছবিসহ প্রিভিউ ও এপ্রুভ)</h3>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>ছবি</th><th>আইডি/রোল</th><th>নাম</th><th>শ্রেণি</th><th>পরীক্ষা</th><th>প্রস্তুতকারক শিক্ষক</th><th>অবস্থা</th><th>অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody id="admin_results_tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- খ) নোটিশ পরিচালনা -->
+        <div id="admin-sub-notice_manage" style="display:none;">
+          <h3>📌 নতুন নোটিশ প্রকাশ করুন (ছবি / PDF ফাইলসহ)</h3>
+          <form onsubmit="handleNoticePublish(event)" style="background:#f1f5f9; padding:15px; border-radius:6px; margin-bottom:20px;">
+            <div class="form-group">
+              <label>নোটিশের শিরোনাম / বিষয়:</label>
+              <input type="text" id="admin_notice_title" placeholder="যেমন: ২০২৬ সালের অর্ধবার্ষিক পরীক্ষার সময়সূচী" required>
+            </div>
+            <div class="form-group">
+              <label>বিস্তারিত বিবরণ (ঐচ্ছিক):</label>
+              <textarea id="admin_notice_details" rows="3" placeholder="নোটিশের সারসংক্ষেপ বা বিবরণ..."></textarea>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>ফাইল যুক্ত করুন (ছবি অথবা PDF):</label>
+                <input type="file" id="admin_notice_file" accept="image/*,application/pdf" onchange="previewNoticeFile(event)">
+              </div>
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top:10px;">📢 নোটিশ পাবলিশ করুন</button>
+          </form>
+
+          <h4>প্রকাশিত নোটিশের তালিকা:</h4>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>তারিখ</th>
+                <th>শিরোনাম</th>
+                <th>সংযুক্তি</th>
+                <th>অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody id="admin_notice_manage_tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- গ) শিক্ষক এন্ট্রি -->
+        <div id="admin-sub-teacher_entry" style="display:none;">
+          <h3>👨‍🏫 নতুন শিক্ষক অ্যাকাউন্ট এন্ট্রি করুন (সর্বোচ্চ ২০ জন)</h3>
+          <form onsubmit="handleAddNewTeacher(event)" style="background:#f1f5f9; padding:12px; border-radius:6px; margin-bottom:15px;">
+            <div class="form-grid">
+              <div class="form-group"><label>শিক্ষকের নাম:</label><input type="text" id="new_t_name" placeholder="যেমন: মাওলানা হাফেজ আহমেদ" required></div>
+              <div class="form-group"><label>শিক্ষক আইডি (User ID):</label><input type="text" id="new_t_id" placeholder="যেমন: T-03" required></div>
+              <div class="form-group"><label>পাসওয়ার্ড:</label><input type="text" id="new_t_pass" value="123456" required></div>
+              <div class="form-group"><label>পদবী / বিষয়:</label><input type="text" id="new_t_subject" placeholder="যেমন: আরবি শিক্ষক" required></div>
+              <div class="form-group"><label>মোবাইল নম্বর:</label><input type="tel" id="new_t_phone" required></div>
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top:10px;">➕ শিক্ষক অ্যাকাউন্ট তৈরি করুন</button>
+          </form>
+          <h4>নিবন্ধিত শিক্ষক তালিকা:</h4>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>আইডি</th><th>নাম</th><th>পদবী/বিষয়</th><th>মোবাইল</th><th>পাসওয়ার্ড</th><th>অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody id="admin_teachers_manage_tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- ঘ) ভর্তি আবেদনসমূহ (প্রিন্ট ও ডাউনলোড সুবিধাসহ) -->
+        <div id="admin-sub-adm_apps" style="display:none;">
+          <h3>অনলাইন ভর্তি আবেদনসমূহ (ফরম ডাউনলোড ও প্রিন্ট অপশনসহ)</h3>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>ছবি</th><th>নাম</th><th>পিতা</th><th>শ্রেণি</th><th>মোবাইল</th><th>তারিখ</th><th>অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody id="admin_admission_tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- ঙ) অভিযোগ -->
+        <div id="admin-sub-reports_view" style="display:none;">
+          <h3>অভিযোগ ও মতামত তালিকা</h3>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>নাম</th><th>মোবাইল</th><th>অভিযোগ</th>
+              </tr>
+            </thead>
+            <tbody id="admin_reports_tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- চ) পাসওয়ার্ড পরিবর্তন -->
+        <div id="admin-sub-change_pass" style="display:none;">
+          <h3>🔑 এডমিন পাসওয়ার্ড পরিবর্তন</h3>
+          <form onsubmit="handleAdminChangePassword(event)" style="max-width:400px; background:#f1f5f9; padding:15px; border-radius:6px; margin-top:10px;">
+            <div class="form-group">
+              <label>বর্তমান পাসওয়ার্ড:</label>
+              <input type="password" id="old_admin_pass" required>
+            </div>
+            <div class="form-group">
+              <label>নতুন পাসওয়ার্ড:</label>
+              <input type="password" id="new_admin_pass" required>
+            </div>
+            <div class="form-group">
+              <label>নতুন পাসওয়ার্ড পুনরায় লিখুন:</label>
+              <input type="password" id="confirm_admin_pass" required>
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top:10px; width:100%;">পাসওয়ার্ড আপডেট করুন</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ভর্তি ফরম দেখার এবং প্রিন্ট/ডাউনলোড করার মোডাল (Popup Modal) -->
+<div class="modal-overlay" id="admission_form_modal">
+  <div class="modal-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0d5c3a; padding-bottom: 8px; margin-bottom: 15px;" class="no-print">
+      <h3 style="color: #0d5c3a;">📄 শিক্ষার্থীর ভর্তি ফরম বিবরণ</h3>
+      <button onclick="closeAdmissionModal()" class="btn-danger">❌ বন্ধ করুন</button>
+    </div>
+
+    <!-- প্রিন্ট এরিয়া -->
+    <div id="printable_admission_form" class="print-area" style="padding: 15px; border: 2px solid #0d5c3a; border-radius: 6px; background: #fff;">
+      <div style="text-align: center; border-bottom: 2px dashed #0d5c3a; padding-bottom: 10px; margin-bottom: 15px;">
+        <h2 style="color: #0d5c3a; font-size: 20px;">বটতলী ইসলামি সিনিয়র আলিম মাদ্রাসা</h2>
+        <p style="font-size: 12px; color: #555;">পরশুরাম, ফেনী। (EIIN: 106697)</p>
+        <span style="display: inline-block; background: #0d5c3a; color: white; padding: 3px 12px; border-radius: 4px; font-weight: bold; font-size: 13px; margin-top: 6px;">অনলাইন ভর্তি আবেদন ফরম</span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; gap: 15px; margin-bottom: 15px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <tr><td style="padding: 6px; font-weight: bold; width: 30%;">শিক্ষার্থীর নাম:</td><td id="pop_adm_name" style="padding: 6px;"></td></tr>
+          <tr><td style="padding: 6px; font-weight: bold;">পিতার নাম:</td><td id="pop_adm_father" style="padding: 6px;"></td></tr>
+          <tr><td style="padding: 6px; font-weight: bold;">মাতার নাম:</td><td id="pop_adm_mother" style="padding: 6px;"></td></tr>
+          <tr><td style="padding: 6px; font-weight: bold;">ভর্তির শ্রেণি:</td><td id="pop_adm_class" style="padding: 6px; font-weight: bold; color: #0d5c3a;"></td></tr>
+          <tr><td style="padding: 6px; font-weight: bold;">জন্ম তারিখ:</td><td id="pop_adm_dob" style="padding: 6px;"></td></tr>
+          <tr><td style="padding: 6px; font-weight: bold;">মোবাইল নম্বর:</td><td id="pop_adm_phone" style="padding: 6px;"></td></tr>
+          <tr><td style="padding: 6px; font-weight: bold;">আবেদনের তারিখ:</td><td id="pop_adm_date" style="padding: 6px;"></td></tr>
+        </table>
+        <div style="width: 110px; height: 130px; border: 1px solid #0d5c3a; border-radius: 4px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <img id="pop_adm_photo" src="" style="width: 100%; height: 100%; object-fit: cover;" alt="Student Photo">
+        </div>
+      </div>
+
+      <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 12px; border-top: 1px solid #ddd; padding-top: 20px;">
+        <div>________________________<br>অভিভাবকের স্বাক্ষর</div>
+        <div>________________________<br>যাচাইকারীর স্বাক্ষর</div>
+        <div>________________________<br>অধ্যক্ষের স্বাক্ষর ও সিল</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 15px; text-align: right;" class="no-print">
+      <button class="btn-action btn-print" style="padding: 8px 16px; font-size: 13px;" onclick="window.print()">🖨️ ফরম প্রিন্ট / PDF ডাউনলোড</button>
+    </div>
+  </div>
+</div>
+
+<!-- অটো মেসেজ পপআপ মোডাল -->
+<div class="modal-overlay" id="auto_msg_modal">
+  <div class="modal-content" style="max-width:450px; text-align:center;">
+    <h3 style="color:#0d5c3a; margin-bottom:10px;" id="auto_msg_title">🤖 অটো রেসপন্স বার্তা</h3>
+    <p style="font-size:13px; line-height:1.6; color:#333; margin-bottom:15px;" id="auto_msg_body"></p>
+    <button onclick="closeAutoMsgModal()" class="btn-submit">ঠিক আছে</button>
+  </div>
+</div>
+
+<!-- শিক্ষক কর্তৃক উত্তরপত্র বিস্তারিত দেখার মোডাল -->
+<div class="modal-overlay" id="submission_view_modal">
+  <div class="modal-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0d5c3a; padding-bottom: 8px; margin-bottom: 15px;">
+      <h3 style="color: #0d5c3a;">📝 উত্তরপত্র ও অটো-যাচাই রেজাল্ট</h3>
+      <button onclick="closeSubmissionModal()" class="btn-danger">❌ বন্ধ করুন</button>
+    </div>
+    <div id="submission_details_body"></div>
+  </div>
+</div>
+
+<!-- ভাসমান অটো-মেসেজ বোতাম -->
+<button class="chat-widget-btn no-print" onclick="triggerAutoHelpMsg()">💬 অটো সহায়তা</button>
+
+<!-- ফুটার -->
+<footer>
+  &copy; ২০২৬ বটতলী ইসলামি সিনিয়র আলিম মাদ্রাসা | সর্বস্বত্ব সংরক্ষিত।
+</footer>
+
+<!-- JavaScript logic -->
+<script>
+// --- FIREBASE সেটআপ ---
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_KEY"
+};
+
+if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+  firebase.initializeApp(firebaseConfig);
+}
+
+function updateLiveTime() {
+  const now = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', calendar: 'gregory' };
+  document.getElementById('live_time_display').innerText = '🕒 ' + now.toLocaleDateString('bn-BD', options);
+}
+setInterval(updateLiveTime, 1000);
+updateLiveTime();
+
+function switchTab(tabId, event) {
+  const tabs = document.querySelectorAll('.page-tab');
+  tabs.forEach(tab => tab.classList.remove('active-tab'));
+  const targetTab = document.getElementById('tab-' + tabId);
+  if (targetTab) targetTab.classList.add('active-tab');
+
+  const buttons = document.querySelectorAll('nav .tab-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+}
+
+function switchAdminSub(subId, event) {
+  document.getElementById('admin-sub-teacher_entry').style.display = 'none';
+  document.getElementById('admin-sub-res_app').style.display = 'none';
+  document.getElementById('admin-sub-notice_manage').style.display = 'none';
+  document.getElementById('admin-sub-adm_apps').style.display = 'none';
+  document.getElementById('admin-sub-reports_view').style.display = 'none';
+  document.getElementById('admin-sub-change_pass').style.display = 'none';
+  
+  document.getElementById('admin-sub-' + subId).style.display = 'block';
+  const btns = event.target.parentElement.querySelectorAll('.admin-sub-btn');
+  btns.forEach(b => b.classList.remove('active-sub'));
+  if(event && event.target) event.target.classList.add('active-sub');
+}
+
+function switchTeacherSub(subId, event) {
+  document.getElementById('teacher-sub-manual_entry').style.display = 'none';
+  document.getElementById('teacher-sub-create_exam').style.display = 'none';
+  document.getElementById('teacher-sub-verify_submissions').style.display = 'none';
+
+  document.getElementById('teacher-sub-' + subId).style.display = 'block';
+  const btns = event.target.parentElement.querySelectorAll('.admin-sub-btn');
+  btns.forEach(b => b.classList.remove('active-sub'));
+  if(event && event.target) event.target.classList.add('active-sub');
+}
+
+// Auto Message Helper Function
+function showAutoMessage(title, message) {
+  document.getElementById('auto_msg_title').innerText = title;
+  document.getElementById('auto_msg_body').innerText = message;
+  document.getElementById('auto_msg_modal').style.display = 'flex';
+}
+
+function closeAutoMsgModal() {
+  document.getElementById('auto_msg_modal').style.display = 'none';
+}
+
+function triggerAutoHelpMsg() {
+  showAutoMessage(
+    "🤖 বটতলী মাদ্রাসা হেল্পডেস্ক", 
+    "আসসালামু আলাইকুম! আমাদের অনলাইন পোর্টালে আপনাকে স্বাগতম। ভর্তি ফরম পুরণ, পরীক্ষার ফলাফল বা যেকোনো প্রয়োজনে নির্দিষ্ট ট্যাবে যান। অতিরিক্ত তথ্যের জন্য 'অভিযোগ/রিপোর্ট' অপশনে মেসেজ দিন।"
+  );
+}
+
+// Image Compression Utility
+function compressImage(file, callback) {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = function (e) {
+    const img = new Image();
+    img.src = e.target.result;
+    img.onload = function () {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 300;
+      const MAX_HEIGHT = 350;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', 0.7));
+    }
+  }
+}
+
+// Dynamic Subject Row Logic
+function addSubjectRow(name = '', mark = '') {
+  const container = document.getElementById('dynamic_subjects_container');
+  const rowId = 'sub_row_' + Date.now() + Math.random().toString(36).substr(2, 4);
+  
+  const div = document.createElement('div');
+  div.className = 'subject-row';
+  div.id = rowId;
+  div.innerHTML = `
+    <input type="text" class="sub-name-input" placeholder="বিষয়ের নাম (যেমন: কুরআন)" value="${name}" required style="flex: 2;">
+    <input type="number" class="sub-mark-input" placeholder="প্রাপ্ত নম্বর" value="${mark}" required min="0" max="100" style="flex: 1;">
+    <button type="button" class="btn-action btn-delete" onclick="removeSubjectRow('${rowId}')" title="মুছে ফেলুন">❌</button>
+  `;
+  container.appendChild(div);
+}
+
+function removeSubjectRow(rowId) {
+  const container = document.getElementById('dynamic_subjects_container');
+  if (container.children.length <= 1) {
+    alert('কমপক্ষে একটি বিষয় থাকা আবশ্যক!');
+    return;
+  }
+  const row = document.getElementById(rowId);
+  if (row) row.remove();
+}
+
+function initDefaultSubjects() {
+  const container = document.getElementById('dynamic_subjects_container');
+  if(container) {
+    container.innerHTML = '';
+    addSubjectRow("কুরআন ও তাজভিদ/আকাইদ", "85");
+    addSubjectRow("বাংলা ও ইংরেজি", "80");
+    addSubjectRow("গণিত ও বিজ্ঞান", "75");
+  }
+}
+
+// Data Local & State Store
+let adminPassword = localStorage.getItem('adminPassword') || '123456';
+let currentLoggedTeacher = JSON.parse(sessionStorage.getItem('loggedTeacher')) || null;
+let isAdminLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
+
+let teachersAccountDB = JSON.parse(localStorage.getItem('teachersAccountDB')) || [
+  { id: "T-01", name: "মাওলানা মোহাম্মদ আলী", pass: "123456", subject: "কুরআন ও তাজভিদ", phone: "01700000000" },
+  { id: "T-02", name: "জনাব রফিকুল ইসলাম", pass: "123456", subject: "গণিত ও বিজ্ঞান", phone: "01800000000" }
+];
+
+let resultsDB = JSON.parse(localStorage.getItem('resultsDB')) || [
+  { id: "ST-101", name: "আব্দুল্লাহ", class: "১০ম শ্রেণি", roll: "5", status: "published", type: "বার্ষিক পরীক্ষা", teacher: "T-01", photo: "", subjects: [ { name: "কুরআন ও তাজভিদ/আকাইদ", mark: 88, grade: "A+" }, { name: "বাংলা ও ইংরেজি", mark: 80, grade: "A+" }, { name: "গণিত ও বিজ্ঞান", mark: 75, grade: "A" } ], total: 243, gpa: "5.00 (A+)" }
+];
+
+let noticesDB = JSON.parse(localStorage.getItem('noticesDB')) || [
+  { title: "২০২৬ শিক্ষাবর্ষের ভর্তি তথ্য", details: "আমাদের অনলাইন পোর্টালে অনলাইন ভর্তি কার্যক্রম চলমান রয়েছে।", date: new Date().toLocaleDateString('bn-BD'), fileData: "", fileType: "" }
+];
+
+let admissionsDB = JSON.parse(localStorage.getItem('admissionsDB')) || [];
+let reportsDB = JSON.parse(localStorage.getItem('reportsDB')) || [];
+
+// অনলাইন পরীক্ষা ডাটাবেস
+let examQuestionsDB = JSON.parse(localStorage.getItem('examQuestionsDB')) || [];
+let examSubmissionsDB = JSON.parse(localStorage.getItem('examSubmissionsDB')) || [];
+
+// এডমিন পাসওয়ার্ড পরিবর্তন
+function handleAdminChangePassword(e) {
+  e.preventDefault();
+  const oldPass = document.getElementById('old_admin_pass').value;
+  const newPass = document.getElementById('new_admin_pass').value;
+  const confirmPass = document.getElementById('confirm_admin_pass').value;
+
+  if (oldPass !== adminPassword) {
+    alert('বর্তমান পাসওয়ার্ডটি সঠিক নয়!');
+    return;
+  }
+  if (newPass !== confirmPass) {
+    alert('নতুন পাসওয়ার্ড দুটি মিলছে না!');
+    return;
+  }
+  if (newPass.length < 4) {
+    alert('পাসওয়ার্ডটি অন্তত ৪ অক্ষরের হতে হবে।');
+    return;
+  }
+
+  adminPassword = newPass;
+  localStorage.setItem('adminPassword', adminPassword);
+  alert('এডমিন পাসওয়ার্ড সফলভাবে আপডেট করা হয়েছে!');
+  e.target.reset();
+}
+
+// AUTHENTICATION LOGIC
+function handleAdminLogin() {
+  const u = document.getElementById('admin_user_id').value;
+  const p = document.getElementById('admin_user_pass').value;
+  
+  if(u === 'admin' && p === adminPassword) {
+    isAdminLoggedIn = true;
+    sessionStorage.setItem('isAdminLoggedIn', 'true');
+    checkAuthStates();
+    alert('এডমিন প্যানেলে সফলভাবে লগইন হয়েছে!');
+  } else {
+    alert('ভুল এডমিন আইডি অথবা পাসওয়ার্ড!');
+  }
+}
+
+function logoutAdmin() {
+  isAdminLoggedIn = false;
+  sessionStorage.removeItem('isAdminLoggedIn');
+  checkAuthStates();
+}
+
+function handleTeacherLogin() {
+  const u = document.getElementById('teacher_user_id').value;
+  const p = document.getElementById('teacher_user_pass').value;
+  const teacher = teachersAccountDB.find(t => t.id === u && t.pass === p);
+  
+  if(teacher) {
+    currentLoggedTeacher = teacher;
+    sessionStorage.setItem('loggedTeacher', JSON.stringify(teacher));
+    checkAuthStates();
+    alert(`স্বাগতম ${teacher.name}! আপনার শিক্ষক প্যানেলে লগইন হয়েছে।`);
+  } else {
+    alert('ভুল টিচার আইডি অথবা পাসওয়ার্ড!');
+  }
+}
+
+function logoutTeacher() {
+  currentLoggedTeacher = null;
+  sessionStorage.removeItem('loggedTeacher');
+  checkAuthStates();
+}
+
+function checkAuthStates() {
+  if(isAdminLoggedIn) {
+    document.getElementById('admin_login_box').style.display = 'none';
+    document.getElementById('admin_dashboard_box').style.display = 'block';
+  } else {
+    document.getElementById('admin_login_box').style.display = 'block';
+    document.getElementById('admin_dashboard_box').style.display = 'none';
+  }
+
+  if(currentLoggedTeacher) {
+    document.getElementById('teacher_login_box').style.display = 'none';
+    document.getElementById('teacher_dashboard_box').style.display = 'block';
+    document.getElementById('current_teacher_name').innerText = currentLoggedTeacher.name;
+    document.getElementById('current_teacher_id').innerText = currentLoggedTeacher.id;
+    document.getElementById('current_teacher_subject').innerText = currentLoggedTeacher.subject;
+  } else {
+    document.getElementById('teacher_login_box').style.display = 'block';
+    document.getElementById('teacher_dashboard_box').style.display = 'none';
+  }
+  renderAllDataPanels();
+}
+
+// ছবি প্রিভিউ ও কম্প্রেশন
+let currentResultPhotoBase64 = '';
+function previewResultStudentPhoto(event) {
+  const file = event.target.files[0];
+  if (file) {
+    compressImage(file, function(base64Img) {
+      currentResultPhotoBase64 = base64Img;
+      document.getElementById('tr_photo_preview').innerHTML = `<img src="${base64Img}">`;
+    });
+  }
+}
+
+function getGradeFromMark(mark) {
+  if (mark >= 80) return 'A+';
+  if (mark >= 70) return 'A';
+  if (mark >= 60) return 'A-';
+  if (mark >= 50) return 'B';
+  if (mark >= 40) return 'C';
+  if (mark >= 33) return 'D';
+  return 'F';
+}
+
+function handleResultUpload(e) {
+  e.preventDefault();
+  if(!currentLoggedTeacher) return;
+
+  const examType = document.getElementById('tr_exam_type').value;
+  const stName = document.getElementById('tr_st_name').value;
+  const stId = document.getElementById('tr_st_id').value;
+  const stRoll = document.getElementById('tr_st_roll').value;
+  const stClass = document.getElementById('tr_st_class').value;
+
+  const subjectNameInputs = document.querySelectorAll('.sub-name-input');
+  const subjectMarkInputs = document.querySelectorAll('.sub-mark-input');
+
+  const subjects = [];
+  let total = 0;
+  let hasFailed = false;
+
+  for (let i = 0; i < subjectNameInputs.length; i++) {
+    const sName = subjectNameInputs[i].value.trim();
+    const sMark = parseInt(subjectMarkInputs[i].value) || 0;
+    
+    if(!sName) continue;
+
+    const grade = getGradeFromMark(sMark);
+    if(grade === 'F') hasFailed = true;
+
+    total += sMark;
+    subjects.push({
+      name: sName,
+      mark: sMark,
+      grade: grade
+    });
+  }
+
+  if (subjects.length === 0) {
+    alert('কমপক্ষে একটি বিষয় ও নম্বর যুক্ত করুন!');
+    return;
+  }
+
+  const avg = total / subjects.length;
+  let gpaVal = "0.00 (F)";
+  if (!hasFailed) {
+    gpaVal = avg >= 80 ? "5.00 (A+)" : (avg >= 70 ? "4.00 (A)" : (avg >= 60 ? "3.50 (A-)" : (avg >= 50 ? "3.00 (B)" : "2.00 (C)")));
+  }
+
+  const newRes = {
+    id: stId,
+    name: stName,
+    class: stClass,
+    roll: stRoll,
+    status: 'pending',
+    type: examType,
+    teacher: `${currentLoggedTeacher.name} (${currentLoggedTeacher.id})`,
+    photo: currentResultPhotoBase64,
+    subjects: subjects,
+    total: total,
+    gpa: gpaVal
+  };
+
+  resultsDB.push(newRes);
+  localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
+  alert(`${examType}-এর রেজাল্ট সফলভাবে জমা দেওয়া হয়েছে! এডমিন এপ্রুভ করলে শিক্ষার্থীরা দেখতে পাবে।`);
+  
+  e.target.reset();
+  initDefaultSubjects();
+  document.getElementById('tr_photo_preview').innerHTML = '<span style="font-size: 10px; color: #888;">ছবি নির্বাচন করুন</span>';
+  currentResultPhotoBase64 = '';
+  renderAllDataPanels();
+}
+
+function approveResult(index) {
+  resultsDB[index].status = 'published';
+  localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
+  renderAllDataPanels();
+  alert('রেজাল্ট এপ্রুভ করে প্রকাশিত (Published) করা হয়েছে!');
+}
+
+function deleteResult(index) {
+  if(confirm('আপনি কি এই রেজাল্টটি ডিলিট করতে চান?')) {
+    resultsDB.splice(index, 1);
+    localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
+    renderAllDataPanels();
+  }
+}
+
+function searchAnnualResult() {
+  const examType = document.getElementById('search_res_type').value;
+  const cls = document.getElementById('search_res_class').value;
+  const roll = document.getElementById('search_res_roll').value;
+
+  const res = resultsDB.find(r => r.type === examType && r.class === cls && String(r.roll) === String(roll) && r.status === 'published');
+  const display = document.getElementById('annual_result_display');
+
+  if (res) {
+    document.getElementById('res_exam_type_title').innerText = res.type;
+    document.getElementById('res_st_name').innerText = res.name;
+    document.getElementById('res_st_id').innerText = res.id;
+    document.getElementById('res_st_class').innerText = res.class;
+    document.getElementById('res_st_roll').innerText = res.roll;
+    document.getElementById('res_st_total').innerText = res.total;
+    document.getElementById('res_st_gpa').innerText = res.gpa;
+
+    const photoBox = document.getElementById('res_st_photo_box');
+    if(res.photo && res.photo.trim() !== "") {
+      photoBox.innerHTML = `<img src="${res.photo}">`;
+    } else {
+      photoBox.innerHTML = `<span style="font-size:10px; color:#aaa;">ছবি নেই</span>`;
+    }
+
+    const tbody = document.getElementById('res_subjects_tbody');
+    tbody.innerHTML = res.subjects.map(s => `<tr><td>${s.name}</td><td>${s.mark}</td><td>${s.grade}</td></tr>`).join('');
+    
+    display.style.display = 'block';
+  } else {
+    alert(`দুঃখিত! ${examType}-এর জন্য বর্ণিত শ্রেণি ও রোলে কোনো প্রকাশিত ফলাফল পাওয়া যায়নি।`);
+    display.style.display = 'none';
+  }
+}
+
+// ------------------- শিক্ষক প্যানেলে ২০টি প্রশ্ন তৈরি -------------------
+function initQuestionCreatorForm() {
+  const wrapper = document.getElementById('questions_creator_wrapper');
+  if(!wrapper) return;
+  
+  let html = '';
+  for(let i = 1; i <= 20; i++) {
+    html += `
+      <div class="q-box">
+        <h4>প্রশ্ন নং ${i}</h4>
+        <div class="form-group">
+          <input type="text" class="q-title-input" placeholder="প্রশ্ন লিখুন (যেমন: কুরআনে মোট কয়টি সূরা আছে?)" required>
+        </div>
+        <div class="form-grid" style="margin-top:5px;">
+          <div class="form-group"><input type="text" class="q-opt1-input" placeholder="অপশন ১" required></div>
+          <div class="form-group"><input type="text" class="q-opt2-input" placeholder="অপশন ২" required></div>
+          <div class="form-group"><input type="text" class="q-opt3-input" placeholder="অপশন ৩" required></div>
+          <div class="form-group"><input type="text" class="q-opt4-input" placeholder="অপশন ৪" required></div>
+        </div>
+        <div class="form-group" style="margin-top:5px;">
+          <label style="color:#0d5c3a;">সঠিক উত্তরটি নির্বাচন করুন:</label>
+          <select class="q-ans-select" required>
+            <option value="1">অপশন ১</option>
+            <option value="2">অপশন ২</option>
+            <option value="3">অপশন ৩</option>
+            <option value="4">অপশন ৪</option>
+          </select>
+        </div>
+      </div>
+    `;
+  }
+  wrapper.innerHTML = html;
+}
+
+function handleSaveTeacherQuestions(e) {
+  e.preventDefault();
+  if(!currentLoggedTeacher) return;
+
+  const targetClass = document.getElementById('create_exam_class').value;
+  const targetSubject = document.getElementById('create_exam_subject').value.trim();
+
+  const qTitles = document.querySelectorAll('.q-title-input');
+  const qOpt1s = document.querySelectorAll('.q-opt1-input');
+  const qOpt2s = document.querySelectorAll('.q-opt2-input');
+  const qOpt3s = document.querySelectorAll('.q-opt3-input');
+  const qOpt4s = document.querySelectorAll('.q-opt4-input');
+  const qAns = document.querySelectorAll('.q-ans-select');
+
+  const questionsList = [];
+  for(let i = 0; i < 20; i++) {
+    questionsList.push({
+      id: i + 1,
+      title: qTitles[i].value,
+      options: [qOpt1s[i].value, qOpt2s[i].value, qOpt3s[i].value, qOpt4s[i].value],
+      correct: parseInt(qAns[i].value)
+    });
+  }
+
+  const examData = {
+    examId: 'EXAM_' + Date.now(),
+    class: targetClass,
+    subject: targetSubject,
+    teacher: `${currentLoggedTeacher.name} (${currentLoggedTeacher.id})`,
+    date: new Date().toLocaleDateString('bn-BD'),
+    questions: questionsList
+  };
+
+  const existIdx = examQuestionsDB.findIndex(q => q.class === targetClass && q.subject === targetSubject);
+  if(existIdx !== -1) {
+    examQuestionsDB[existIdx] = examData;
+  } else {
+    examQuestionsDB.push(examData);
+  }
+
+  localStorage.setItem('examQuestionsDB', JSON.stringify(examQuestionsDB));
+  alert(`সফলভাবে ${targetClass}-এর "${targetSubject}" বিষয়ের ২০টি প্রশ্ন সেভ ও লাইভ করা হয়েছে!`);
+  e.target.reset();
+  renderAllDataPanels();
+}
+
+// ------------------- অনলাইন পরীক্ষা (শিক্ষার্থী প্যানেল) -------------------
+function loadExamSubjectOptions() {
+  const cls = document.getElementById('exam_select_class').value;
+  const subSelect = document.getElementById('exam_select_subject');
+  subSelect.innerHTML = '<option value="">বিষয় বাছুন</option>';
+
+  const availableExams = examQuestionsDB.filter(q => q.class === cls);
+  if(availableExams.length === 0) {
+    subSelect.innerHTML = '<option value="">এই শ্রেণির কোনো লাইভ পরীক্ষা নেই</option>';
+  } else {
+    availableExams.forEach(e => {
+      subSelect.innerHTML += `<option value="${e.subject}">${e.subject}</option>`;
+    });
+  }
+}
+
+let examTimerInterval = null;
+let currentActiveExam = null;
+
+function startStudentExam() {
+  const stName = document.getElementById('ex_st_name').value.trim();
+  const stRoll = document.getElementById('ex_st_roll').value.trim();
+  const stClass = document.getElementById('exam_select_class').value;
+  const stSubject = document.getElementById('exam_select_subject').value;
+
+  if(!stName || !stRoll || !stClass || !stSubject) {
+    alert('দয়া করে পরীক্ষার আগে সমস্ত তথ্য (নাম, রোল, শ্রেণি ও বিষয়) পুরণ করুন!');
+    return;
+  }
+
+  currentActiveExam = examQuestionsDB.find(q => q.class === stClass && q.subject === stSubject);
+  if(!currentActiveExam || !currentActiveExam.questions || currentActiveExam.questions.length === 0) {
+    alert('দুঃখিত! এই বিষয়ের জন্য প্রশ্ন পাওয়া যায়নি।');
+    return;
+  }
+
+  document.getElementById('run_st_name').innerText = stName;
+  document.getElementById('run_st_class').innerText = stClass;
+  document.getElementById('run_st_roll').innerText = stRoll;
+  document.getElementById('run_st_subject').innerText = stSubject;
+
+  const container = document.getElementById('exam_questions_container');
+  container.innerHTML = currentActiveExam.questions.map((q, idx) => `
+    <div class="q-box">
+      <h4>${idx + 1}. ${q.title}</h4>
+      <div class="q-options">
+        ${q.options.map((opt, oIdx) => `
+          <label class="q-option-label">
+            <input type="radio" name="q_ans_${q.id}" value="${oIdx + 1}" required>
+            ${opt}
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('exam_init_box').style.display = 'none';
+  document.getElementById('exam_running_box').style.display = 'block';
+
+  let timeRemaining = 1200; 
+  const timerDisplay = document.getElementById('exam_timer_display');
+
+  if(examTimerInterval) clearInterval(examTimerInterval);
+  examTimerInterval = setInterval(() => {
+    timeRemaining--;
+    let m = Math.floor(timeRemaining / 60);
+    let s = timeRemaining % 60;
+    timerDisplay.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+
+    if(timeRemaining <= 0) {
+      clearInterval(examTimerInterval);
+      alert('⏰ সময় শেষ! আপনার উত্তরপত্র স্বয়ংক্রিয়ভাবে জমা দেওয়া হচ্ছে।');
+      document.getElementById('student_exam_form').requestSubmit();
+    }
+  }, 1000);
+}
+
+function submitStudentExam(e) {
+  e.preventDefault();
+  if(examTimerInterval) clearInterval(examTimerInterval);
+
+  const stName = document.getElementById('run_st_name').innerText;
+  const stClass = document.getElementById('run_st_class').innerText;
+  const stRoll = document.getElementById('run_st_roll').innerText;
+  const stSubject = document.getElementById('run_st_subject').innerText;
+
+  let autoScore = 0;
+  const studentAnswers = [];
+
+  currentActiveExam.questions.forEach(q => {
+    const selectedOption = document.querySelector(`input[name="q_ans_${q.id}"]:checked`);
+    const ansVal = selectedOption ? parseInt(selectedOption.value) : 0;
+    
+    let isCorrect = false;
+    if(ansVal === q.correct) {
+      autoScore += 1;
+      isCorrect = true;
+    }
+
+    studentAnswers.push({
+      questionId: q.id,
+      questionTitle: q.title,
+      selectedAnswer: ansVal,
+      correctAnswer: q.correct,
+      isCorrect: isCorrect,
+      options: q.options
+    });
+  });
+
+  const submissionObj = {
+    submissionId: 'SUB_' + Date.now(),
+    studentName: stName,
+    studentClass: stClass,
+    studentRoll: stRoll,
+    subject: stSubject,
+    autoScore: autoScore,
+    totalQuestions: currentActiveExam.questions.length,
+    teacher: currentActiveExam.teacher,
+    submittedAt: new Date().toLocaleTimeString('bn-BD') + ', ' + new Date().toLocaleDateString('bn-BD'),
+    answers: studentAnswers,
+    status: 'pending'
+  };
+
+  examSubmissionsDB.unshift(submissionObj);
+  localStorage.setItem('examSubmissionsDB', JSON.stringify(examSubmissionsDB));
+
+  showAutoMessage(
+    "✅ পরীক্ষা সম্পন্ন হয়েছে", 
+    `ধন্যবাদ ${stName}! আপনার উত্তরপত্র সফলভাবে শিক্ষকদের নিকট জমা হয়েছে।\nআপনি ২০টি প্রশ্নের মধ্যে অটো-যাচাইয়ে ${autoScore} নম্বর পেয়েছেন।`
+  );
+
+  document.getElementById('exam_running_box').style.display = 'none';
+  document.getElementById('exam_init_box').style.display = 'block';
+  document.getElementById('student_exam_form').reset();
+  renderAllDataPanels();
+}
+
+// ------------------- শিক্ষক প্যানেলে উত্তরপত্র যাচাই -------------------
+function openSubmissionModal(index) {
+  const item = examSubmissionsDB[index];
+  if(!item) return;
+
+  let bodyHtml = `
+    <div style="background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:15px; font-size:13px;">
+      <p><strong>পরীক্ষার্থীর নাম:</strong> ${item.studentName}</p>
+      <p><strong>শ্রেণি:</strong> ${item.studentClass} | <strong>রোল:</strong> ${item.studentRoll}</p>
+      <p><strong>বিষয়:</strong> ${item.subject}</p>
+      <p><strong>অটো-যাচাইকৃত প্রাপ্ত নম্বর:</strong> <span style="color:#0d5c3a; font-weight:bold; font-size:16px;">${item.autoScore} / ${item.totalQuestions}</span></p>
+      <p><strong>জমার সময়:</strong> ${item.submittedAt}</p>
+    </div>
+
+    <h4 style="margin-bottom:10px;">উত্তরপত্র বিস্তারিত:</h4>
+    <div style="max-height:300px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:6px; margin-bottom:15px;">
+  `;
+
+  item.answers.forEach((ans, idx) => {
+    bodyHtml += `
+      <div style="margin-bottom:10px; padding:8px; border-bottom:1px solid #eee; font-size:12px;">
+        <p><strong>${idx + 1}. ${ans.questionTitle}</strong></p>
+        <p>শিক্ষার্থীর উত্তর: <span style="color:${ans.isCorrect ? 'green' : 'red'}; font-weight:bold;">${ans.selectedAnswer > 0 ? ans.options[ans.selectedAnswer - 1] : 'উত্তর দেয়নি'} (${ans.isCorrect ? '✅ সঠিক' : '❌ ভুল'})</span></p>
+        ${!ans.isCorrect ? `<p style="color:#059669;">সঠিক উত্তর ছিল: ${ans.options[ans.correctAnswer - 1]}</p>` : ''}
+      </div>
+    `;
+  });
+
+  bodyHtml += `
+    </div>
+    <button class="btn-submit" style="width:100%; font-size:14px;" onclick="publishExamResultToMainSheet(${index})">✅ এই রেজাল্টটি ফাইনাল রেজাল্ট শিটে যুক্ত ও পাবলিশ করুন</button>
+  `;
+
+  document.getElementById('submission_details_body').innerHTML = bodyHtml;
+  document.getElementById('submission_view_modal').style.display = 'flex';
+}
+
+function closeSubmissionModal() {
+  document.getElementById('submission_view_modal').style.display = 'none';
+}
+
+function publishExamResultToMainSheet(index) {
+  const item = examSubmissionsDB[index];
+  if(!item) return;
+
+  const markPercentage = (item.autoScore / item.totalQuestions) * 100;
+  const grade = getGradeFromMark(markPercentage);
+
+  const newRes = {
+    id: 'EX-' + item.studentRoll,
+    name: item.studentName,
+    class: item.studentClass,
+    roll: item.studentRoll,
+    status: 'published',
+    type: 'অনলাইন কুইজ পরীক্ষা',
+    teacher: item.teacher || 'অনলাইন সিস্টেম',
+    photo: '',
+    subjects: [
+      { name: item.subject, mark: Math.round(markPercentage), grade: grade }
+    ],
+    total: item.autoScore,
+    gpa: `${markPercentage >= 33 ? 'পাস' : 'ফেল'} (${grade})`
+  };
+
+  resultsDB.push(newRes);
+  localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
+
+  examSubmissionsDB[index].status = 'verified';
+  localStorage.setItem('examSubmissionsDB', JSON.stringify(examSubmissionsDB));
+
+  closeSubmissionModal();
+  alert(`সফলভাবে ${item.studentName}-এর অনলাইন পরীক্ষার রেজাল্ট পাবলিশ করা হয়েছে!`);
+  renderAllDataPanels();
+}
+
+function deleteSubmission(index) {
+  if(confirm('আপনি কি এই খাতাটি ডিলিট করতে চান?')) {
+    examSubmissionsDB.splice(index, 1);
+    localStorage.setItem('examSubmissionsDB', JSON.stringify(examSubmissionsDB));
+    renderAllDataPanels();
+  }
+}
+
+// নোটিশ ম্যানেজমেন্ট
+let currentNoticeFileData = "";
+let currentNoticeFileType = "";
+
+function previewNoticeFile(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  currentNoticeFileType = file.type;
+  
+  if (file.type.startsWith('image/')) {
+    compressImage(file, function(base64) {
+      currentNoticeFileData = base64;
+    });
+  } else {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      currentNoticeFileData = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function handleNoticePublish(e) {
+  e.preventDefault();
+  const title = document.getElementById('admin_notice_title').value;
+  const details = document.getElementById('admin_notice_details').value;
+
+  const noticeObj = {
+    title: title,
+    details: details,
+    date: new Date().toLocaleDateString('bn-BD'),
+    fileData: currentNoticeFileData,
+    fileType: currentNoticeFileType
+  };
+
+  noticesDB.unshift(noticeObj);
+  localStorage.setItem('noticesDB', JSON.stringify(noticesDB));
+  
+  alert('নতুন নোটিশ সফলভাবে পাবলিশ করা হয়েছে!');
+  e.target.reset();
+  currentNoticeFileData = "";
+  currentNoticeFileType = "";
+  renderAllDataPanels();
+}
+
+function deleteNotice(index) {
+  if(confirm('আপনি কি এই নোটিশটি মুছে ফেলতে চান?')) {
+    noticesDB.splice(index, 1);
+    localStorage.setItem('noticesDB', JSON.stringify(noticesDB));
+    renderAllDataPanels();
+  }
+}
+
+function handleAddNewTeacher(e) {
+  e.preventDefault();
+  if(teachersAccountDB.length >= 20) {
+    alert('সর্বোচ্চ ২০ জন শিক্ষক ইউজার তৈরি করা হয়ে গেছে!');
+    return;
+  }
+  const newTeacher = {
+    id: document.getElementById('new_t_id').value,
+    name: document.getElementById('new_t_name').value,
+    pass: document.getElementById('new_t_pass').value,
+    subject: document.getElementById('new_t_subject').value,
+    phone: document.getElementById('new_t_phone').value
+  };
+
+  if(teachersAccountDB.some(t => t.id === newTeacher.id)) {
+    alert('এই টিচার ইউজার আইডি পূর্বে ব্যবহৃত হয়েছে!');
+    return;
+  }
+
+  teachersAccountDB.push(newTeacher);
+  localStorage.setItem('teachersAccountDB', JSON.stringify(teachersAccountDB));
+  alert('নতুন শিক্ষক অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!');
+  e.target.reset();
+  renderAllDataPanels();
+}
+
+function deleteTeacherAccount(index) {
+  if(confirm('আপনি কি এই শিক্ষকের অ্যাকাউন্ট ডিলিট করতে চান?')) {
+    teachersAccountDB.splice(index, 1);
+    localStorage.setItem('teachersAccountDB', JSON.stringify(teachersAccountDB));
+    renderAllDataPanels();
+  }
+}
+
+// --- ভর্তি ফরম পপ-আপ ও প্রিন্ট/ডাউনলোড লজিক ---
+function openAdmissionModal(index) {
+  const item = admissionsDB[index];
+  if(!item) return;
+
+  document.getElementById('pop_adm_name').innerText = item.name || '';
+  document.getElementById('pop_adm_father').innerText = item.father || '';
+  document.getElementById('pop_adm_mother').innerText = item.mother || 'N/A';
+  document.getElementById('pop_adm_class').innerText = item.class || '';
+  document.getElementById('pop_adm_dob').innerText = item.dob || 'N/A';
+  document.getElementById('pop_adm_phone').innerText = item.phone || '';
+  document.getElementById('pop_adm_date').innerText = item.date || '';
+  document.getElementById('pop_adm_photo').src = item.photo || 'https://via.placeholder.com/110x130';
+
+  document.getElementById('admission_form_modal').style.display = 'flex';
+}
+
+function closeAdmissionModal() {
+  document.getElementById('admission_form_modal').style.display = 'none';
+}
+
+function deleteAdmission(index) {
+  if(confirm('আপনি কি এই ভর্তি আবেদনটি ডিলিট করতে চান?')) {
+    admissionsDB.splice(index, 1);
+    localStorage.setItem('admissionsDB', JSON.stringify(admissionsDB));
+    renderAllDataPanels();
+  }
+}
+
+function renderAllDataPanels() {
+  // ১. পাবলিক শিক্ষক তালিকা
+  const trPublicBody = document.getElementById('teachers_public_tbody');
+  if(trPublicBody) trPublicBody.innerHTML = teachersAccountDB.map(t => `<tr><td>${t.id}</td><td>${t.name}</td><td>${t.subject}</td><td>${t.phone}</td></tr>`).join('');
+
+  // ২. এডমিন শিক্ষক পরিচালনা তালিকা
+  const trAdminManageBody = document.getElementById('admin_teachers_manage_tbody');
+  if(trAdminManageBody) {
+    trAdminManageBody.innerHTML = teachersAccountDB.map((t, index) => `
+      <tr>
+        <td><strong>${t.id}</strong></td>
+        <td>${t.name}</td>
+        <td>${t.subject}</td>
+        <td>${t.phone}</td>
+        <td><code>${t.pass}</code></td>
+        <td><button class="btn-action btn-delete" onclick="deleteTeacherAccount(${index})">ডিলিট</button></td>
+      </tr>
+    `).join('');
+  }
+
+  // ৩. রেজাল্ট তালিকা
+  const resBody = document.getElementById('admin_results_tbody');
+  if(resBody) {
+    if(resultsDB.length === 0) {
+      resBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#777;">কোনো রেজাল্ট জমা হয়নি।</td></tr>`;
+    } else {
+      resBody.innerHTML = resultsDB.map((r, index) => `
+        <tr>
+          <td><img src="${r.photo && r.photo !== '' ? r.photo : 'https://via.placeholder.com/40'}" class="table-avatar"></td>
+          <td><strong>${r.id}</strong> (রোল: ${r.roll})</td>
+          <td>${r.name}</td>
+          <td>${r.class}</td>
+          <td><small>${r.type}</small></td>
+          <td><small>${r.teacher || 'N/A'}</small></td>
+          <td><span class="${r.status==='published'?'badge-published':'badge-pending'}">${r.status === 'published' ? 'অনুমোদিত' : 'পেন্ডিং'}</span></td>
+          <td>
+            ${r.status==='pending'? `<button class="btn-action btn-print" onclick="approveResult(${index})">এপ্রুভ করুন</button>`: '<span style="color:green; font-size:11px;">পাবলিশড</span>'}
+            <button class="btn-action btn-delete" onclick="deleteResult(${index})">ডিলিট</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // ৪. শিক্ষক প্যানেলে শিক্ষার্থীদের জমা উত্তরপত্র রেন্ডার
+  const trSubmissionsBody = document.getElementById('teacher_submissions_tbody');
+  if(trSubmissionsBody) {
+    if(examSubmissionsDB.length === 0) {
+      trSubmissionsBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#777;">এখনও কোনো শিক্ষার্থী উত্তরপত্র জমা দেয়নি।</td></tr>`;
+    } else {
+      trSubmissionsBody.innerHTML = examSubmissionsDB.map((sub, idx) => `
+        <tr>
+          <td><strong>${sub.studentRoll}</strong></td>
+          <td>${sub.studentName}</td>
+          <td>${sub.studentClass}</td>
+          <td>${sub.subject}</td>
+          <td><strong style="color:#0d5c3a;">${sub.autoScore} / ${sub.totalQuestions}</strong></td>
+          <td><small>${sub.submittedAt}</small></td>
+          <td>
+            <button class="btn-action btn-view" onclick="openSubmissionModal(${idx})">👁️ উত্তরপত্র দেখুন ও রেজাল্ট দিন</button>
+            <button class="btn-action btn-delete" onclick="deleteSubmission(${idx})">ডিলিট</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // ৫. নোটিশ বোর্ড এবং মার্কিউ আপডেট
+  const publicNoticeBox = document.getElementById('public_notice_list');
+  const adminNoticeTable = document.getElementById('admin_notice_manage_tbody');
+
+  if (noticesDB.length > 0) {
+    document.getElementById('marquee_notice_text').innerText = noticesDB[0].title + (noticesDB[0].details ? " - " + noticesDB[0].details : "");
+
+    if(publicNoticeBox) {
+      publicNoticeBox.innerHTML = noticesDB.map(n => {
+        let mediaHtml = '';
+        if(n.fileData) {
+          if(n.fileType && n.fileType.includes('pdf')) {
+            mediaHtml = `<div class="notice-media"><a href="${n.fileData}" download="Notice.pdf" target="_blank" class="pdf-link">📄 PDF নোটিশ ডাউনলোড / ভিউ করুন</a></div>`;
+          } else {
+            mediaHtml = `<div class="notice-media"><img src="${n.fileData}" alt="Notice Image"></div>`;
+          }
+        }
+        return `
+          <div class="notice-card">
+            <h4>📌 ${n.title}</h4>
+            <div class="notice-date">প্রকাশের তারিখ: ${n.date}</div>
+            <p>${n.details || ''}</p>
+            ${mediaHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    if(adminNoticeTable) {
+      adminNoticeTable.innerHTML = noticesDB.map((n, idx) => `
+        <tr>
+          <td>${n.date}</td>
+          <td><strong>${n.title}</strong></td>
+          <td>${n.fileData ? (n.fileType && n.fileType.includes('pdf') ? '📄 PDF সংযুক্ত' : '🖼️ ছবি সংযুক্ত') : 'টেক্সট নোটিশ'}</td>
+          <td><button class="btn-action btn-delete" onclick="deleteNotice(${idx})">ডিলিট</button>
+        </tr>
+      `).join('');
+    }
+  } else {
+    if(publicNoticeBox) publicNoticeBox.innerHTML = `<p>বর্তমানে কোনো নতুন নোটিশ নেই।</p>`;
+    if(adminNoticeTable) adminNoticeTable.innerHTML = `<tr><td colspan="4" style="text-align:center;">কোনো নোটিশ নেই।</td></tr>`;
+  }
+
+  // ৬. ভর্তি আবেদন (ডাউনলোড ও প্রিন্ট বোতাম সহ)
+  const admBody = document.getElementById('admin_admission_tbody');
+  if(admBody) {
+    if(admissionsDB.length === 0) {
+      admBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#777;">কোনো ভর্তি আবেদন নেই।</td></tr>`;
+    } else {
+      admBody.innerHTML = admissionsDB.map((a, idx) => `
+        <tr>
+          <td><img src="${a.photo || 'https://via.placeholder.com/40'}" class="table-avatar"></td>
+          <td><strong>${a.name}</strong></td>
+          <td>${a.father}</td>
+          <td>${a.class}</td>
+          <td>${a.phone}</td>
+          <td>${a.date}</td>
+          <td>
+            <button class="btn-action btn-print" onclick="openAdmissionModal(${idx})">🖨️ প্রিন্ট / ডাউনলোড</button>
+            <button class="btn-action btn-delete" onclick="deleteAdmission(${idx})">ডিলিট</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // ৭. অভিযোগ
+  const repBody = document.getElementById('admin_reports_tbody');
+  if(repBody) repBody.innerHTML = reportsDB.map(rp => `<tr><td>${rp.name}</td><td>${rp.phone}</td><td>${rp.msg}</td></tr>`).join('');
+}
+
+let currentUploadedPhotoBase64 = '';
+function previewStudentPhoto(event) {
+  const file = event.target.files[0];
+  if (file) {
+    compressImage(file, function(base64) {
+      currentUploadedPhotoBase64 = base64;
+      document.getElementById('adm_photo_preview').innerHTML = `<img src="${base64}">`;
+    });
+  }
+}
+
+function handleAdmission(e) {
+  e.preventDefault();
+  const data = {
+    name: document.getElementById('adm_st_name').value,
+    father: document.getElementById('adm_fa_name').value,
+    mother: document.getElementById('adm_mo_name').value,
+    dob: document.getElementById('adm_dob').value,
+    class: document.getElementById('adm_class').value,
+    phone: document.getElementById('adm_phone').value,
+    photo: currentUploadedPhotoBase64,
+    date: new Date().toLocaleDateString('bn-BD')
+  };
+  admissionsDB.push(data);
+  localStorage.setItem('admissionsDB', JSON.stringify(admissionsDB));
+  
+  // অটো মেসেজ
+  showAutoMessage(
+    "🎉 ভর্তি আবেদন সফল!", 
+    `ধন্যবাদ ${data.name}! আপনার ভর্তি আবেদন সফলভাবে গ্রহণ করা হয়েছে। নিচে ডাউনলোড বোতামে ক্লিক করে আবেদন ফরমটি প্রিন্ট অথবা PDF হিসেবে সেভ করুন।`
+  );
+
+  // ভর্তি ফর্মে ডাউনলোডের অপশন শো করা
+  document.getElementById('latest_admission_download_card').style.display = 'block';
+
+  e.target.reset();
+  document.getElementById('adm_photo_preview').innerHTML = '<span style="font-size: 10px; color: #888;">ছবি নির্বাচন করুন</span>';
+  currentUploadedPhotoBase64 = '';
+  renderAllDataPanels();
+}
+
+function handleReportSubmit(e) {
+  e.preventDefault();
+  const data = {
+    name: document.getElementById('rep_name').value,
+    phone: document.getElementById('rep_phone').value,
+    msg: document.getElementById('rep_msg').value
+  };
+  reportsDB.push(data);
+  localStorage.setItem('reportsDB', JSON.stringify(reportsDB));
+
+  // অটো মেসেজ
+  showAutoMessage(
+    "📩 ফিডব্যাক গৃহীত হয়েছে", 
+    `ধন্যবাদ ${data.name}! আপনার মতামত/অভিযোগ এডমিন প্যানেলে নিবন্ধিত হয়েছে। খুব শীঘ্রই প্রয়োজনীয় ব্যবস্থা গ্রহণ করা হবে।`
+  );
+
+  e.target.reset();
+  renderAllDataPanels();
+}
+
+window.onload = function() {
+  initDefaultSubjects();
+  initQuestionCreatorForm();
+  checkAuthStates();
+};
+</script>
+</body>
+</html>
